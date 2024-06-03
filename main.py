@@ -44,23 +44,23 @@ def gauss_jordan(x: List[float], y: List[float], verbose=0) -> List[float]:
 
 
 def L(X: List[float], Y: List[float]) -> Callable[[float], float]:
-    if len(X) != len(Y): raise ValueError("Dimensiones diferentes en X e Y.")
+    if len(X) != len(Y): raise ValueError("Размерность X не совпадает с Y.")
 
-    pares: Iterable[float] = list(zip(X, Y))
-    pares.sort(key = lambda x: x[0])
-    X, Y  = zip(*pares)
+    pairs: Iterable[float] = list(zip(X, Y))
+    pairs.sort(key = lambda x: x[0])
+    X, Y  = zip(*pairs)
 
-    def polinomio(x: float) -> float:
-        resultado: float = 0 
+    def polinom(x: float) -> float:
+        result: float = 0 
         for i in range(len(X)): 
-            termino: float = Y[i] 
+            term: float = Y[i] 
             for j in range(len(X)): 
                 if j != i: 
-                    termino *= (x - X[j]) / (X[i] - X[j]) 
-            resultado += termino 
-        return resultado 
+                    term *= (x - X[j]) / (X[i] - X[j]) 
+            result += term 
+        return result 
 
-    return polinomio
+    return polinom
 
 
 def find_extremums(X: List[float], Y: List[float], lagrange_poly: float) -> List[float]: 
