@@ -63,23 +63,21 @@ def L(X: List[float], Y: List[float]) -> Callable[[float], float]:
     return polinom
 
 
-def find_extremums(X: List[float], Y: List[float], lagrange_poly: float) -> List[float]: 
-    critical_points: List[float] = [] 
-    for i in range(len(X)): 
-        x: float = X[i] 
-        L_derivative: float = 0 
-        for j in range(len(X)): 
-            if j != i: 
-                term: float = 1 / (x - X[j]) 
-                for k in range(len(X)): 
-                    if k != i and k != j: 
-                        term *= (x - X[k]) / (X[i] - X[k]) 
-                L_derivative += term 
+def derivative(f):
+    def df(x, h=1e-5):
+        return (f(x + h) - f(x)) / h
+    return df
 
-        if L_derivative == 0: 
-            critical_points.append(x) 
+def newton(f: Callable[[float], float], f_prime: Callable[[float], float], x0: float, 
+           eps: float=1e-7, kmax: int=1e3) -> float:
 
-    return critical_points
+    x, x_prev, i = x0, x0 + 2 * eps, 0
+
+    while abs(x - x_prev) >= eps and i < kmax:
+        x, x_prev, i = x - f(x) / f_prime(x), x, i + 1
+
+    return x
+
 
 def main() -> None:
     m_A = np.array([
@@ -97,7 +95,7 @@ def main() -> None:
     f: Callable[[float], float] = L(m_B, m_Y)
     print(f"Многочлен лагранжа в x_0 = 2: {f(2)}")
     
-    e = find_extremums(m_B, m_Y, f(2))
+    e = find_extrema(f, derivative(f), 2)
     print(f"Экстремумы: {e}")
 
     plt.plot(m_B, m_Y)
