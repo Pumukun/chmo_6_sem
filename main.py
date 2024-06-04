@@ -68,13 +68,13 @@ def derivative(f):
         return (f(x + h) - f(x)) / h
     return df
 
-def newton(f: Callable[[float], float], f_prime: Callable[[float], float], x0: float, 
+def newton(f: Callable[[float], float], df: Callable[[float], float], x0: float, 
            eps: float=1e-7, kmax: int=1e3) -> float:
 
     x, x_prev, i = x0, x0 + 2 * eps, 0
 
     while abs(x - x_prev) >= eps and i < kmax:
-        x, x_prev, i = x - f(x) / f_prime(x), x, i + 1
+        x, x_prev, i = x - f(x) / df(x), x, i + 1
 
     return x
 
@@ -87,19 +87,37 @@ def main() -> None:
         [1, 1, 1, 3, -1],
         [-1, 0, 0, -1, 3]
     ])
-    m_B = np.array([2, 4, 6, 8, 10])
-    m_Y = gauss_jordan(m_A, m_B, 1)
+    m_X = np.array([2, 4, 6, 8, 10])
+    m_Y = gauss_jordan(m_A, m_X, 1)
 
     print(f"Значения y_i: {m_Y}")
 
-    f: Callable[[float], float] = L(m_B, m_Y)
-    print(f"Многочлен лагранжа в x_0 = 2: {f(2)}")
+    lagr = []
+    f: Callable[[float], float] = L(m_X, m_Y)
+    for i in range(len(m_X)):
+        lagr.append(f(m_X[i]))
+    print(f"Многочлен лагранжа в x: {lagr}")
     
-    e = find_extrema(f, derivative(f), 2)
-    print(f"Экстремумы: {e}")
+    e = []
+    x_e = []
+    for i in range(20):
+        n = newton(f, derivative(f), i)
+        if round(n, 5) not in e:
+            e.append(round(n, 5))
 
-    plt.plot(m_B, m_Y)
-    #plt.show()
+    for i in e:
+        x_e = f(e)
+    print(f"Экстремумы: {e}")
+    
+    x = np.linspace(0, 10, 100)
+    y = list(map(f, x))
+    plt.plot(x, y, color='blue', linestyle='-')
+    plt.xlabel('x')
+    plt.ylabel('y')
+    plt.title('График вызываемой функции')
+    #plt.scatter(m_B, lagr, color='red', marker='x')
+    plt.scatter(e, x_e, color='red', marker='x')
+    plt.show()
 
 if __name__ == "__main__":
     main()
